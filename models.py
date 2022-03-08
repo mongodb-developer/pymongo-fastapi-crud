@@ -20,9 +20,9 @@ class Book(BaseModel):
 
 
 class BookUpdate(BaseModel):
-    title: str = Field(...)
-    author: str = Field(...)
-    synopsis: str = Field(...)
+    title: Optional[str]
+    author: Optional[str]
+    synopsis: Optional[str]
 
     class Config:
         schema_extra = {

@@ -1,0 +1,4 @@
+fastapi==0.75.0
+pydantic==1.9
+pymongo==3.11.0
+python-dotenv==0.19.2
