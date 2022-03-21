@@ -22,6 +22,7 @@ def list_books(request: Request):
     books = list(request.app.database["books"].find(limit=100))
     return books
 
+
 @router.get("/{id}", response_description="Get a single book by id", response_model=Book)
 def find_book(id: str, request: Request):
     if (book := request.app.database["books"].find_one({"_id": id})) is not None:
@@ -39,11 +40,8 @@ def update_book(id: str, request: Request, book: BookUpdate = Body(...)):
             {"_id": id}, {"$set": book}
         )
 
-        if update_result.modified_count == 1:
-            if (
-                updated_book := request.app.database["books"].find_one({"_id": id})
-            ) is not None:
-                return updated_book
+        if update_result.modified_count == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
 
     if (
         existing_book := request.app.database["books"].find_one({"_id": id})
