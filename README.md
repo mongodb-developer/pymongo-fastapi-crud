@@ -1,6 +1,6 @@
 # PyMongo with FastAPI CRUD application
 
-This is a simple CRUD application built using PyMongo and FastAPI.
+This is a simple CRUD application built using PyMongo and FastAPI. You can also follow the step-by-step [tutorial](https://www.mongodb.com/languages/python/pymongo-tutorial) for building this application.
 
 ## Running the server
 
