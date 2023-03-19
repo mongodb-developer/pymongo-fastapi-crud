@@ -19,6 +19,35 @@ class Book(BaseModel):
             }
         }
 
+class BookCreate(BaseModel):
+    id: str = Field(default_factory=uuid.uuid4, alias="_id")
+    title: str = Field(...)
+    author: str = Field(...)
+    synopsis: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "title": "Don Quixote",
+                "author": "Miguel de Cervantes",
+                "synopsis": "..."
+            }
+        }
+class BookCreate(BaseModel):
+    title: str = Field(...)
+    author: str = Field(...)
+    synopsis: str = Field(...)
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "title": "Don Quixote",
+                "author": "Miguel de Cervantes",
+                "synopsis": "..."
+            }
+        }
 
 class BookUpdate(BaseModel):
     title: Optional[str]
