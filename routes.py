@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from typing import List
-import uuid
+from bson import ObjectId
 from models import Book, BookUpdate, BookCreate
 
 router = APIRouter()
 
-@router.post("/", response_description="Create a new book", status_code=status.HTTP_201_CREATED, response_model=Book)
+@router.post("/", response_description="Create a new book", status_code=status.HTTP_201_CREATED)
 def create_book(request: Request, book: BookCreate = Body(...)):
     book = jsonable_encoder(book)
-    book["_id"] = str(uuid.uuid4())
 
     # verify if book title already exists
     if request.app.database["books"].find_one({"title": book["title"]}):
@@ -21,18 +20,22 @@ def create_book(request: Request, book: BookCreate = Body(...)):
         {"_id": new_book.inserted_id}
     )
 
-    return created_book
+    created_book['id'] = str(created_book['_id'])
+    return Book(**created_book)
 
 
 @router.get("/", response_description="List all books", response_model=List[Book])
 def list_books(request: Request):
     books = list(request.app.database["books"].find(limit=100))
+    for book in books:
+        book['id'] = str(book['_id'])
     return books
 
 
 @router.get("/{id}", response_description="Get a single book by id", response_model=Book)
 def find_book(id: str, request: Request):
-    if (book := request.app.database["books"].find_one({"_id": id})) is not None:
+    if (book := request.app.database["books"].find_one({"_id": ObjectId(id)})) is not None:
+        book['id'] = str(book['_id'])
         return book
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
@@ -44,15 +47,16 @@ def update_book(id: str, request: Request, book: BookUpdate = Body(...)):
 
     if len(book) >= 1:
         update_result = request.app.database["books"].update_one(
-            {"_id": id}, {"$set": book}
+            {"_id": ObjectId(id)}, {"$set": book}
         )
 
         if update_result.modified_count == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
 
     if (
-        existing_book := request.app.database["books"].find_one({"_id": id})
+        existing_book := request.app.database["books"].find_one({"_id": ObjectId(id)})
     ) is not None:
+        existing_book['id'] = str(existing_book['_id'])
         return existing_book
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Book with ID {id} not found")
@@ -60,7 +64,7 @@ def update_book(id: str, request: Request, book: BookUpdate = Body(...)):
 
 @router.delete("/{id}", response_description="Delete a book")
 def delete_book(id: str, request: Request, response: Response):
-    delete_result = request.app.database["books"].delete_one({"_id": id})
+    delete_result = request.app.database["books"].delete_one({"_id": ObjectId(id)})
 
     if delete_result.deleted_count == 1:
         response.status_code = status.HTTP_204_NO_CONTENT
