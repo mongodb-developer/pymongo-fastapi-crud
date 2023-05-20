@@ -16,8 +16,8 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    app.mongodb_client.close()
     app.database.drop_collection("books")
+    app.mongodb_client.close()
 
 def test_create_book():
     with TestClient(app) as client:
