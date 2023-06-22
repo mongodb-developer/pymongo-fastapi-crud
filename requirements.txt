@@ -1,5 +1,5 @@
-fastapi[all]==0.75.0
-pydantic==1.9
-pymongo[srv]==3.11.0
-python-dotenv==0.19.2
-pytest==7.0.1
+fastapi[all]==0.94.1
+pydantic==1.10.6
+pymongo[srv]==4.3.3
+python-dotenv==1.0.0
+pytest==7.2.2
